@@ -4,9 +4,9 @@
     {
         private RequestDelegate next;
 
-        public QueryStringMiddleWare(RequestDelegate nextDelegate)
+        public QueryStringMiddleWare()
         {
-            this.next = nextDelegate;
+            //this.next = nextDelegate;
         }
         public async Task Invoke(HttpContext context)
         {
@@ -18,7 +18,10 @@
                 }
                 await context.Response.WriteAsync("Class-based Middleware \n");
             }
-            await next(context);
+            if (next != null)
+            {
+                await next(context);
+            }
         }
     }
 }
