@@ -1,37 +1,22 @@
+using Microsoft.Extensions.Options;
 using Platform;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<MessageOptions>(options =>
+{
+    options.CityName = "Albany";
+});
+
 var app = builder.Build();
 
-// http://localhost:5000/branch?custom=true
-app.Map("/branch", branch =>
-{
-    //branch.Run(async (HttpContext context) =>
-    //{
-    //    await context.Response.WriteAsync($"Branch F Middleware");
-    //});
-    branch.Run(new QueryStringMiddleWare().Invoke);
-    branch.Use(async (HttpContext context, Func<Task> next) =>
-    {
-        await context.Response.WriteAsync($"After Middleware");
-    });
-});
-
-// http://localhost:5000/?branch2&custom=true
-//app.MapWhen(context => context.Request.Query.Keys.Contains("branch2"), branch =>
+//app.MapGet("/location", async (HttpContext context, IOptions<MessageOptions> msgOpts) =>
 //{
-//    branch.UseMiddleware<QueryStringMiddleWare>();
-//    branch.Use(async (HttpContext context, Func<Task> next) =>
-//    {
-//        await context.Response.WriteAsync($"Branch2 Middleware");
-//    });
+//    Platform.MessageOptions opts = msgOpts.Value;
+//    await context.Response.WriteAsync($"{opts.CityName}, {opts.CountryName}");
 //});
 
-//app.UseMiddleware<QueryStringMiddleWare>();
+app.UseMiddleware<LocationMiddleware>();
 
-app.MapGet("/", async (HttpContext context) =>
-{
-    await context.Response.WriteAsync("MapGet \n");
-});
+app.MapGet("/", () => "Hello World!");
 
 app.Run();
