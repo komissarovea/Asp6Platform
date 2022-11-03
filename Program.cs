@@ -3,33 +3,24 @@ using Platform;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<RouteOptions>(opts =>
 {
-    opts.ConstraintMap.Add("countryName",  typeof(CountryRouteConstraint));
+    opts.ConstraintMap.Add("countryName", typeof(CountryRouteConstraint));
 });
 
 var app = builder.Build();
 
-//app.MapGet("{firs:alpha:length(3)}/{secon:bool}", async context =>
-//{
-//    await context.Response.WriteAsync("Request Was Routed\n");
-//    foreach (var kvp in context.Request.RouteValues)
-//    {
-//        await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
-//    }
-//});
-
-app.MapGet("capital/{country:countryName}", Capital.Endpoint);
-//app.MapGet("capital/{country:regex(^uk|france|monaco$)}", Capital.Endpoint);
-app.MapGet("size/{city?}", Population.Endpoint2).WithMetadata(new RouteNameMetadata("population2"));
-
-
-app.MapGet("{*path}", async context =>
+app.Map("{number:int}", async context =>
 {
-    await context.Response.WriteAsync("Routed to fallback endpoint\n");
+    await context.Response.WriteAsync("Routed to the int endpoint");
+}).Add(b => ((RouteEndpointBuilder)b).Order = 22);
 
-    foreach (var kvp in context.Request.RouteValues)
-    {
-        await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
-    }
+app.Map("{number:double}", async context =>
+{
+    await context.Response.WriteAsync("Routed to the double endpoint");
+}).Add(b => ((RouteEndpointBuilder)b).Order = 33);
+
+app.MapFallback(async context =>
+{
+    await context.Response.WriteAsync("Routed to fallback endpoint");
 });
 
 app.Run();
