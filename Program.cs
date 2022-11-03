@@ -4,17 +4,30 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-
-app.MapGet("routing", async context =>
+app.MapGet("{first}/{second}/{third}", async context =>
 {
-    await context.Response.WriteAsync("Request Was Routed");
+    await context.Response.WriteAsync("Request Was Routed 3\n");
+    foreach (var kvp in context.Request.RouteValues)
+    {
+        await context.Response .WriteAsync($"{kvp.Key}: {kvp.Value}\n");
+    }
 });
+
+app.MapGet("{first}/{second}", async context =>
+{
+    await context.Response.WriteAsync("Request Was Routed 2\n");
+    foreach (var kvp in context.Request.RouteValues)
+    {
+        await context.Response.WriteAsync($"{kvp.Key}: {kvp.Value}\n");
+    }
+});
+
 app.MapGet("capital/uk", new Capital().Invoke);
 app.MapGet("population/paris", new Population().Invoke);
 
-//app.Run(async (context) =>
-//{
-//    await context.Response.WriteAsync("Terminal Middleware Reached");
-//});
+app.MapGet(String.Empty, async (HttpContext context) =>
+{
+    await context.Response.WriteAsync("Default \n");
+});
 
 app.Run();
