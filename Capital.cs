@@ -2,16 +2,7 @@
 {
     public class Capital
     {
-        //private RequestDelegate? next;
-
-        //public Capital() { }
-
-        //public Capital(RequestDelegate nextDelegate)
-        //{
-        //    next = nextDelegate;
-        //}
-
-        public async Task Invoke(HttpContext context)
+        public static async Task Endpoint(HttpContext context)
         {
             string? capital = null;
             string? country = context.Request.RouteValues["country"] as string;
@@ -24,7 +15,13 @@
                     capital = "Paris";
                     break;
                 case "monaco":
-                    context.Response.Redirect($"/population/{country}");
+                    //context.Response.Redirect($"/population/{country}");
+                    LinkGenerator? generator = context.RequestServices.GetService<LinkGenerator>();
+                    string? url = generator?.GetPathByRouteValues(context, "population2", new { city = country });
+                    if (url != null)
+                    {
+                        context.Response.Redirect(url);
+                    }
                     return;
             }
             if (capital != null)

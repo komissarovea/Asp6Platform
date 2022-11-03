@@ -2,7 +2,7 @@
 {
     public class Population
     {
-        public static async Task Endpoint(HttpContext context)
+        public static async Task Endpoint2(HttpContext context)
         {
             string? city = context.Request.RouteValues["city"] as string;
             int? pop = null;
@@ -20,8 +20,7 @@
             }
             if (pop.HasValue)
             {
-                await context.Response
-                .WriteAsync($"City: {city}, Population: {pop}");
+                await context.Response.WriteAsync($"City: {city}, Population: {pop}");
             }
             else
             {

@@ -22,8 +22,8 @@ app.MapGet("{first}/{second}", async context =>
     }
 });
 
-app.MapGet("capital/{country}", new Capital().Invoke);
-app.MapGet("population/{city}", Population.Endpoint);
+app.MapGet("capital/{country}", Capital.Endpoint);
+app.MapGet("size/{city}", Population.Endpoint2).WithMetadata(new RouteNameMetadata("population2"));
 
 app.MapGet(String.Empty, async (HttpContext context) =>
 {
