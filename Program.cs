@@ -1,11 +1,14 @@
 using Platform;
 using Platform.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
 builder.Services.AddScoped<IResponseFormatter, GuidService>();
 
-var app = builder.Build();
+
+WebApplication app = builder.Build();
+//var newScope = app.Services.CreateScope();
+
 
 app.UseMiddleware<WeatherMiddleware>();
 
@@ -17,9 +20,18 @@ app.MapGet("middleware/function", async (HttpContext context, IResponseFormatter
 //app.MapGet("endpoint/class", WeatherEndpoint.Endpoint2);
 app.MapEndpoint<WeatherEndpoint>("endpoint/class");
 
-app.MapGet("endpoint/function", async (HttpContext context, IResponseFormatter formatter) =>
+//app.MapGet("endpoint/function", async (HttpContext context, IResponseFormatter formatter) =>
+//{
+//    await formatter.Format(context, "Endpoint Function: It is sunny in LA");
+//});
+
+app.MapGet("endpoint/function", async (HttpContext context) =>
 {
-    await formatter.Format(context, "Endpoint Function: It is sunny in LA");
+    IResponseFormatter formatter1 = app.Services.CreateScope().ServiceProvider.GetRequiredService<IResponseFormatter>();
+    IResponseFormatter formatter2 = context.RequestServices.GetRequiredService<IResponseFormatter>();
+    bool tmp = formatter1 == formatter2;
+    Console.WriteLine(tmp);
+    await formatter1.Format(context, "Endpoint Function: It is sunny in LA 2");
 });
 
 app.Run();
