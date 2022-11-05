@@ -3,7 +3,7 @@ using Platform.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
-builder.Services.AddTransient<IResponseFormatter, GuidService>();
+builder.Services.AddScoped<IResponseFormatter, GuidService>();
 
 var app = builder.Build();
 
@@ -14,8 +14,8 @@ app.MapGet("middleware/function", async (HttpContext context, IResponseFormatter
     await formatter.Format(context, "Middleware Function: It is snowing in Chicago");
 });
 
-app.MapGet("endpoint/class", WeatherEndpoint.Endpoint2);
-//app.MapEndpoint<WeatherEndpoint>("endpoint/class");
+//app.MapGet("endpoint/class", WeatherEndpoint.Endpoint2);
+app.MapEndpoint<WeatherEndpoint>("endpoint/class");
 
 app.MapGet("endpoint/function", async (HttpContext context, IResponseFormatter formatter) =>
 {
