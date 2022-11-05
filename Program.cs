@@ -3,12 +3,13 @@ using Platform.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
-builder.Services.AddScoped<IResponseFormatter, GuidService>();
+//builder.Services.AddScoped<IResponseFormatter, GuidService>();
 
+builder.Services.AddScoped<IResponseFormatter, TimeResponseFormatter>();
+builder.Services.AddScoped<ITimeStamper, DefaultTimeStamper>();
 
 WebApplication app = builder.Build();
 //var newScope = app.Services.CreateScope();
-
 
 app.UseMiddleware<WeatherMiddleware>();
 
