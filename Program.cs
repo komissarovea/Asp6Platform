@@ -15,8 +15,8 @@ app.MapGet("middleware/function", async (HttpContext context, IResponseFormatter
     await formatter.Format(context, "Middleware Function: It is snowing in Chicago");
 });
 
-//app.MapGet("endpoint/class", WeatherEndpoint.Endpoint);
-app.MapWeather("endpoint/class");
+// app.MapGet("endpoint/class", WeatherEndpoint.Endpoint);
+app.MapEndpoint<WeatherEndpoint>("endpoint/class");
 
 app.MapGet("endpoint/function", async (HttpContext context, IResponseFormatter formatter) =>
 {
