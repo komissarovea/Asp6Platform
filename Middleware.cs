@@ -37,6 +37,7 @@ namespace Platform
             next = nextDelegate;
             options = opts.Value;
         }
+
         public async Task Invoke(HttpContext context)
         {
             if (context.Request.Path == "/location")
