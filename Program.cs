@@ -2,28 +2,18 @@ using Platform;
 using Platform.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-ConfigurationManager c1 = builder.Configuration;
-IWebHostEnvironment e1 = builder.Environment;
 
-IWebHostEnvironment env = builder.Environment;
-if (env.IsDevelopment())
-{
-    builder.Services.AddScoped<IResponseFormatter, TimeResponseFormatter>();
-    builder.Services.AddScoped<ITimeStamper, DefaultTimeStamper>();
-}
-else
-{
-    builder.Services.AddScoped<IResponseFormatter, HtmlResponseFormatter>();
-}
+//IWebHostEnvironment env = builder.Environment;
+IConfiguration config = builder.Configuration;
 
-builder.Services.AddScoped<IResponseFormatter, TimeResponseFormatter>();
+builder.Services.AddScoped<IResponseFormatter>(serviceProvider => {
+    string? typeName = config["services:IResponseFormatter"];
+    return (IResponseFormatter)ActivatorUtilities .CreateInstance(serviceProvider, typeName == null
+        ? typeof(GuidService) : Type.GetType(typeName, true)!);
+});
 builder.Services.AddScoped<ITimeStamper, DefaultTimeStamper>();
 
 WebApplication app = builder.Build();
-IConfiguration c2 = app.Configuration;
-bool tmp = c1 == c2;
-IWebHostEnvironment e2 = app.Environment;
-tmp = e1 == e2;
 
 app.UseMiddleware<WeatherMiddleware>();
 
