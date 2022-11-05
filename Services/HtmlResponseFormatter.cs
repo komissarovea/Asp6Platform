@@ -2,6 +2,11 @@
 {
     public class HtmlResponseFormatter : IResponseFormatter
     {
+        public HtmlResponseFormatter()
+        {
+
+        }
+
         public async Task Format(HttpContext context, string content)
         {
             context.Response.ContentType = "text/html";
