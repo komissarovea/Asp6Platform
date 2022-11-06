@@ -8,8 +8,15 @@ builder.Services.AddSession(opts =>
     opts.Cookie.IsEssential = true;
 });
 
+// builder.Services.AddHttpsRedirection(opts =>
+// {
+//     opts.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+//     opts.HttpsPort = 443;
+// });
+
 WebApplication app = builder.Build();
 
+app.UseHttpsRedirection();
 app.UseSession();
 
 app.UseMiddleware<Platform.ConsentMiddleware>();
@@ -24,6 +31,10 @@ app.MapGet("/session", async context =>
     await context.Response.WriteAsync($"Counter1: {counter1}, Counter2: {counter2}");
 });
 
-app.MapFallback(async context => await context.Response.WriteAsync("Hello World!"));
+app.MapFallback(async context =>
+{
+    await context.Response.WriteAsync($"HTTPS Request: {context.Request.IsHttps} \n");
+    await context.Response.WriteAsync("Hello World!");
+});
 
 app.Run();
