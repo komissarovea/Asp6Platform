@@ -1,10 +1,12 @@
 ﻿namespace Platform
 {
-    public class Population
+    public partial class Population
     {
         public static async Task Endpoint(HttpContext context, ILogger<Population> logger)
         {
-            logger.LogWarning($"Started processing for {context.Request.Path}");
+            //logger.LogWarning(new EventId(77, "my_id"), $"Started processing for {context.Request.Path}");
+            StartingResponse(logger, context.Request.Path);
+
             string? city = context.Request.RouteValues["city"] as string ?? "london";
             int? pop = null;
             switch ((city ?? "").ToLower())
@@ -27,8 +29,11 @@
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
             }
+
             logger.LogCritical($"Finished processing for {context.Request.Path}");
         }
 
+        [LoggerMessage(0, LogLevel.Debug, "Starting response for {path}")]
+        static partial void StartingResponse(ILogger logger, string path);
     }
 }
