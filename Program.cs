@@ -1,30 +1,32 @@
-using Platform;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.Extensions.FileProviders;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddHttpLogging(opts =>
-{
-    opts.LoggingFields = HttpLoggingFields.RequestMethod
-        | HttpLoggingFields.RequestPath | HttpLoggingFields.ResponseStatusCode;
-});
 
 WebApplication app = builder.Build();
 
-app.UseHttpLogging();
-
-app.UseStaticFiles();
-
-var env = app.Environment;
-app.UseStaticFiles(new StaticFileOptions
+app.MapGet("/cookie", async context =>
 {
-    FileProvider = new PhysicalFileProvider($"{env.ContentRootPath}/staticfiles"),
-    RequestPath = "/files"
+    int counter1 = int.Parse(context.Request.Cookies["counter1"] ?? "0") + 1;
+    context.Response.Cookies.Append("counter1", counter1.ToString(),
+        new CookieOptions
+        {
+            MaxAge = TimeSpan.FromMinutes(30)
+        });
+    int counter2 = int.Parse(context.Request.Cookies["counter2"] ?? "0") + 1;
+    context.Response.Cookies.Append("counter2", counter2.ToString(),
+        new CookieOptions
+        {
+            //Expires = DateTimeOffset.Now.AddSeconds(3),
+            MaxAge = TimeSpan.FromMinutes(30)
+        });
+    await context.Response.WriteAsync($"Counter1: {counter1}, Counter2: {counter2}");
+});
+app.MapGet("clear", context =>
+{
+    context.Response.Cookies.Delete("counter1");
+    context.Response.Cookies.Delete("counter2");
+    context.Response.Redirect("/");
+    return Task.CompletedTask;
 });
 
-app.UseMiddleware<QueryStringMiddleWare>();
-
-app.MapGet("population/{city?}", Population.Endpoint);
+app.MapFallback(async context => await context.Response.WriteAsync("Hello World!"));
 
 app.Run();
