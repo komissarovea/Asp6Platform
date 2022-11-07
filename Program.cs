@@ -1,4 +1,13 @@
+using Microsoft.AspNetCore.HostFiltering;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<HostFilteringOptions>(opts =>
+{
+    opts.AllowedHosts.Clear();
+    opts.AllowedHosts.Add("*.example.com");
+    //opts.IncludeFailureMessage = false;
+});
 
 WebApplication app = builder.Build();
 
