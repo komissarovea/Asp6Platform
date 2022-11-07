@@ -8,13 +8,17 @@ builder.Services.AddSession(opts =>
     opts.Cookie.IsEssential = true;
 });
 
-// builder.Services.AddHttpsRedirection(opts =>
-// {
-//     opts.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-//     opts.HttpsPort = 443;
-// });
+builder.Services.AddHsts(opts =>
+{
+    opts.MaxAge = TimeSpan.FromDays(1);
+    opts.IncludeSubDomains = true;
+});
 
 WebApplication app = builder.Build();
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
 app.UseSession();
