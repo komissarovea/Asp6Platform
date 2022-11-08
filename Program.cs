@@ -2,9 +2,16 @@ using Microsoft.AspNetCore.HostFiltering;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDistributedMemoryCache(opts =>
+// builder.Services.AddDistributedMemoryCache(opts =>
+// {
+//     opts.SizeLimit = 200;
+// });
+
+builder.Services.AddDistributedSqlServerCache(opts =>
 {
-    opts.SizeLimit = 200;
+    opts.ConnectionString = builder.Configuration["ConnectionStrings:CacheConnection"];
+    opts.SchemaName = "dbo";
+    opts.TableName = "DataCache";
 });
 
 WebApplication app = builder.Build();
