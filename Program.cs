@@ -2,40 +2,18 @@ using Microsoft.AspNetCore.HostFiltering;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<HostFilteringOptions>(opts =>
+builder.Services.AddDistributedMemoryCache(opts =>
 {
-    opts.AllowedHosts.Clear();
-    opts.AllowedHosts.Add("*.example.com");
-    //opts.IncludeFailureMessage = false;
+    opts.SizeLimit = 200;
 });
 
 WebApplication app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/error.html");
-    app.UseStaticFiles();
-}
+app.MapEndpoint<Platform.SumEndpoint>("/sum/{count:int=1000000000}");
 
-app.UseStatusCodePages("text/html", Platform.Responses.DefaultResponse);
-
-app.Use(async (context, next) =>
+app.MapGet("/", async context =>
 {
-    if (context.Request.Path == "/error")
-    {
-        context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        await Task.CompletedTask;
-    }
-    else
-    {
-        await next();
-    }
+    await context.Response.WriteAsync("Hello World!");
 });
-
-// app.Run(context =>
-// {
-
-//     //throw new Exception("Something has gone wrong");
-// });
 
 app.Run();
