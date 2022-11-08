@@ -1,20 +1,21 @@
-using Microsoft.AspNetCore.HostFiltering;
+using Platform.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddDistributedMemoryCache(opts =>
+// builder.Services.AddDistributedSqlServerCache(opts =>
 // {
-//     opts.SizeLimit = 200;
+//     opts.ConnectionString = builder.Configuration["ConnectionStrings:CacheConnection"];
+//     opts.SchemaName = "dbo";
+//     opts.TableName = "DataCache";
 // });
 
-builder.Services.AddDistributedSqlServerCache(opts =>
-{
-    opts.ConnectionString = builder.Configuration["ConnectionStrings:CacheConnection"];
-    opts.SchemaName = "dbo";
-    opts.TableName = "DataCache";
-});
+builder.Services.AddResponseCaching();
+builder.Services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
 
 WebApplication app = builder.Build();
+
+app.UseResponseCaching();
+// // app.UseResponseCompression();
 
 app.MapEndpoint<Platform.SumEndpoint>("/sum/{count:int=1000000000}");
 
